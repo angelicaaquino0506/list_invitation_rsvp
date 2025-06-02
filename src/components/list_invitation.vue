@@ -9,8 +9,22 @@
       </div>
       <div class="summary-card pop-bounce">
         <i class="fas fa-users icon-large"></i>
+        <span>Total Not Attendees: {{ eighteenCandlesAttendedCount }}</span>
+      </div>
+      <div class="summary-card pop-bounce">
+        <i class="fas fa-users icon-large"></i>
+        <span>18th Shot Confirmed: {{ eighteenShotAttendedCount }}</span>
+      </div>
+      <div class="summary-card pop-bounce">
+        <i class="fas fa-users icon-large"></i>
         <span>18th Candles Confirmed: {{ eighteenCandlesAttendedCount }}</span>
       </div>
+      <div class="summary-card pop-bounce">
+        <i class="fas fa-users icon-large"></i>
+        <span>18th Roses Confirmed: {{ eighteenCandlesAttendedCount }}</span>
+      </div>
+  
+    
       <div class="summary-card pop-bounce">
         <i class="fas fa-calendar-check icon-large"></i>
         <span>Event Status: Live!</span>
@@ -34,9 +48,20 @@
               <tr v-for="(person, index) in eighteenRosesWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
+                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending', 'swing-in']" :style="{'--item-index': index}">
+                    {{ person.attended ? 'Attended' : 'Pending' }}
+                  </span> -->
+                  <!-- <span class="attendance-tag tag-attended swing-in">{{ person.attended ? person.attended : '' }}</span> -->
+                  <!-- <span class="attendance-tag tag-attended">{{ person.attended ? person.attended : '' }}</span> -->
+
+                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending',]" :style="{'--item-index': index}">
+                    {{ person.attended ? person.attended : '' }}
+                  </span> -->
+
                   <span class="attendance-tag tag-attended">
                     {{ person.attended ? person.attended : '' }}
                   </span>
+                
                 </td>
               </tr>
             </tbody>
@@ -59,6 +84,11 @@
               <tr v-for="(person, index) in eighteenCandlesWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
+                  <!-- tag-not-attended -->
+                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending']">
+                    {{ person.attended ? 'Attended' : 'Pending' }}
+                  </span> -->
+
                   <span class="attendance-tag tag-attended">
                     {{ person.attended ? person.attended : '' }}
                   </span>
@@ -70,6 +100,7 @@
         <p v-else class="empty-message fade-in-text">The 18th Beloved Candles are yet to grace us with their presence.</p>
       </div>
 
+      <!-- 18th Shot -->
       <div class="category pulse-border">
         <h4><i class="fas fa-heart category-icon"></i> The 18th Beloved Shots</h4>
         <div v-if="eighteenShotWithAttendance.length" class="attendee-table-container">
@@ -84,6 +115,10 @@
               <tr v-for="(person, index) in eighteenShotWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
+                  <!-- tag-not-attended -->
+                  <!-- <span >
+                    {{ person.attended }}
+                  </span> -->
                   <span class="attendance-tag tag-attended">
                     {{ person.attended ? person.attended : '' }}
                   </span>
@@ -214,80 +249,21 @@ const eighteenShotsData = ref<{ name: string; value: string }[]>([
 
 let unsubscribe: (() => void) | null = null; // To store the unsubscribe function
 
-// Function to request notification permission
-const requestNotificationPermission = async () => {
-  if (!("Notification" in window)) {
-    console.warn("This browser does not support desktop notification");
-    return;
-  }
-
-  if (Notification.permission !== "granted") {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      console.log("Notification permission granted!");
-    } else {
-      console.warn("Notification permission denied.");
-    }
-  }
-};
-
-// Function to display a notification
-const showNotification = (title: string, body: string, iconUrl?: string) => {
-  if (Notification.permission === "granted") {
-    new Notification(title, {
-      body: body,
-      icon: iconUrl || '/favicon.ico', // You can provide a custom icon URL
-    });
-  }
-};
-
 // Function to set up the real-time listener for users
 const setupUsersListener = () => {
   const usersCollectionRef = collection(db, "users");
   unsubscribe = onSnapshot(usersCollectionRef, (querySnapshot) => {
-    // Keep track of the previous state to detect changes
-    const previousUsers = [...usersList.value];
     const fetchedUsers: any[] = [];
     querySnapshot.forEach((doc) => {
       fetchedUsers.push({ id: doc.id, ...doc.data() });
     });
-
     usersList.value = fetchedUsers;
     console.log("Real-time fetched users:", usersList.value);
 
     // Re-process 18 Candles and 18 Roses data whenever usersList changes
     processEighteenRoses();
     processEighteenCandles(); // Corrected function name
-    processEighteenShot();
-
-    // Check for new attendees or changes in attendance
-    const newAttendees: any[] = [];
-    const updatedAttendees: any[] = [];
-
-    fetchedUsers.forEach(newUser => {
-      const oldUser = previousUsers.find(oldU => oldU.id === newUser.id);
-      if (!oldUser) {
-        newAttendees.push(newUser);
-      } else if (oldUser.attended !== newUser.attended) {
-        updatedAttendees.push(newUser);
-      }
-    });
-
-    // Trigger notifications for new or updated attendees
-    if (newAttendees.length > 0) {
-      newAttendees.forEach(attendee => {
-        const message = `${attendee.name} has just RSVP'd!`;
-        showNotification("New RSVP Received!", message);
-      });
-    }
-    if (updatedAttendees.length > 0) {
-      updatedAttendees.forEach(attendee => {
-        const status = attendee.attended === 'Attending' ? 'confirmed their attendance' : 'updated their RSVP';
-        const message = `${attendee.name} has ${status}!`;
-        showNotification("RSVP Status Updated!", message);
-      });
-    }
-
+    processEighteenShot()
   }, (error) => {
     console.error("Error fetching real-time RSVPs: ", error);
   });
@@ -369,6 +345,12 @@ const processEighteenShot = () => {
 }
 
 
+
+
+
+
+
+
 // 3. Computed Properties for Categorization (remain largely the same)
 // Consider if 'attendees' and its computed properties 'eightCandles' and 'guests' are still needed
 // if all attendee data is now being pulled from 'usersList' and processed into the 'eighteenRosesWithAttendance'
@@ -403,13 +385,16 @@ const totalAttendeesCount = computed(() => {
 });
 
 const eighteenCandlesAttendedCount = computed(() => {
-  // This now correctly counts attendees from the 'eighteenCandlesWithAttendance' list.
-  return eighteenCandlesWithAttendance.value.filter(p => p.attended).length;
+ 
+  return eighteenCandlesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
+});
+const eighteenShotAttendedCount = computed(() => {
+ 
+  return eighteenRosesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
 });
 
 // Lifecycle hooks
 onMounted(() => {
-  requestNotificationPermission(); // Request permission when component mounts
   setupUsersListener(); // Start listening for real-time updates when the component is mounted
 });
 
@@ -828,7 +813,7 @@ h2 {
 }
 
 .tag-attended {
-  /* background-color: #3cb371;  */
+  /* background-color: #3cb371;  */
   background-color: transparent;
   color: black;
 }
@@ -838,7 +823,7 @@ h2 {
 }
 
 .tag-pending {
-  /* background-color: #FFA500;  */
+  /* background-color: #FFA500;  */
   background-color: transparent;
   /* color: white; */
 }
