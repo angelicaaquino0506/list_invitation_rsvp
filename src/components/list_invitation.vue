@@ -34,20 +34,9 @@
               <tr v-for="(person, index) in eighteenRosesWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
-                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending', 'swing-in']" :style="{'--item-index': index}">
-                    {{ person.attended ? 'Attended' : 'Pending' }}
-                  </span> -->
-                  <!-- <span class="attendance-tag tag-attended swing-in">{{ person.attended ? person.attended : '' }}</span> -->
-                  <!-- <span class="attendance-tag tag-attended">{{ person.attended ? person.attended : '' }}</span> -->
-
-                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending',]" :style="{'--item-index': index}">
-                    {{ person.attended ? person.attended : '' }}
-                  </span> -->
-
                   <span class="attendance-tag tag-attended">
                     {{ person.attended ? person.attended : '' }}
                   </span>
-                
                 </td>
               </tr>
             </tbody>
@@ -70,9 +59,33 @@
               <tr v-for="(person, index) in eighteenCandlesWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
-                  <!-- tag-not-attended -->
-                  <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending']">
-                    {{ person.attended ? 'Attended' : 'Pending' }}
+                  <span class="attendance-tag tag-attended">
+                    {{ person.attended ? person.attended : '' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p v-else class="empty-message fade-in-text">The 18th Beloved Candles are yet to grace us with their presence.</p>
+      </div>
+
+      <div class="category pulse-border">
+        <h4><i class="fas fa-heart category-icon"></i> The 18th Beloved Shots</h4>
+        <div v-if="eighteenShotWithAttendance.length" class="attendee-table-container">
+          <table class="attendee-table shimmer-effect">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th style="text-align: center;" class="text-center">Attended?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(person, index) in eighteenShotWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
+                <td>{{ person.name }}</td>
+                <td class="text-center">
+                  <span class="attendance-tag tag-attended">
+                    {{ person.attended ? person.attended : '' }}
                   </span>
                 </td>
               </tr>
@@ -113,7 +126,8 @@ interface Attendee {
 interface EighteenRoseAttendee {
   id: string; // Changed to string to match Firestore doc.id
   name: string;
-  attended: boolean;
+  // attended: boolean;
+  attended: string;
   notAttended: boolean;
   timeAccepted: string;
 }
@@ -121,7 +135,7 @@ interface EighteenRoseAttendee {
 interface EighteenCandlesAttendee {
   id: string;
   name: string;
-  attended: boolean;
+  attended: string;
   notAttended: boolean;
   timeAccepted: string;
 }
@@ -131,25 +145,26 @@ const usersList = ref<any[]>([]);
 const attendees = ref<Attendee[]>([]); // For 'One of the 8 Candles' and 'Guests' - consider if these are still needed if all are in usersList
 const eighteenRosesWithAttendance = ref<EighteenRoseAttendee[]>([]);
 const eighteenCandlesWithAttendance = ref<EighteenCandlesAttendee[]>([]);
+const eighteenShotWithAttendance = ref<EighteenCandlesAttendee[]>([]);
 
 // Predefined 18 Roses data
 const eighteenRosesData = ref<{ name: string; value: string }[]>([
   { name: 'Mr. Arjay magno', value: 'Arjay magno' },
   { name: 'Mr. Reynaldo Aquino', value: 'Reynaldo Aquino' },
   { name: 'Mr. Renz Gonzales', value: 'Renz Gonzales' },
-  { name: 'Mr. Ronald Villio', value: 'Ronald Villio' },
+  { name: 'Mr. Ronald Villo', value: 'Ronald Villo' },
   { name: 'Mr. Efren Rodriguez', value: 'Efren Rodriguez' },
   { name: 'Mr. Ralph Louren Cincua', value: 'Ralph Louren Cincua' },
   { name: 'Mr. Wingard Baraquiel', value: 'Wingard Baraquiel' },
+  { name: 'Mr. Jemuel Hisita', value: 'Jemuel Hisita' },
   { name: 'Mr. Rexie Van Galanta', value: 'Rexie Van Galanta' },
   { name: 'Mr. John Lumbis', value: 'John Lumbis' },
   { name: 'Mr. Aaron Josh Corbita', value: 'Aaron Josh Corbita' },
   { name: 'Mr. Marvy James Bayani', value: 'Marvy James Bayani' },
-  { name: 'Mr. Jhon Ryan Dellosmas', value: 'Jhon Ryan Dellosmas' },
-  { name: 'Mr. Wilfredo Andres', value: 'Wilfredo Andres' },
-  { name: 'Mr. Jasper Panganiban', value: 'Jasper Panganiban' },
+  { name: 'Mr. Jhon Ryan Dellomas', value: 'Jhon Ryan Dellomas' },
+  { name: 'Mr. Wilredo Andres', value: 'Wilredo Andres' },
   { name: 'Mr. Prince Charles Giron', value: 'Prince Charles Giron' },
-  { name: 'Ms. Ma. Zarah Muli', value: 'Zarah Muli' },
+  { name: 'Ms. Jestoni Cabezas', value: 'Jestoni Cabezas' },
   { name: 'Mrs. Maria Thelma Muli', value: 'Maria Thelma Muli' },
   { name: 'Mr. Angelo Muli', value: 'Angelo Muli' },
 ]);
@@ -160,59 +175,119 @@ const eighteenCandelData = ref<{ name: string; value: string }[]>([
   { name: 'Mrs. Marlyn Aquino', value: 'Marlyn Aquino' },
   { name: 'Ms. Precy Aspiras', value: 'Precy Aspiras' },
   { name: 'Ms. Jessica Aspiras', value: 'Jessica Aspiras' },
-  { name: 'Mrs. Louisa Canales', value: 'Louisa Canales' },
-  { name: 'Ms. Lourie kay cincua', value: 'lourie kay cincua' },
+  { name: 'Mrs. Luisa Canales', value: 'Luisa Canales' },
+  { name: 'Ms. Lourie Kay Cincua', value: 'Lourie Kay Cincua' },
   { name: 'Mrs. Liezel Cincua', value: 'Liezel Cincua' },
   { name: 'Ms. Jenifer Aytona', value: 'Jenifer Aytona' },
   { name: 'Mrs. Clarissa Dionaldo', value: 'Clarissa Dionaldo' },
-  { name: 'Ms. Charmie De Torres', value: 'Charmie De Torres' },
+  { name: 'Mrs. Charmie De Torres', value: 'Charmie De Torres' },
   { name: 'Mrs. Joan Magno', value: 'Joan Magno' },
-  { name: 'Mrs. Glenda Rodriguez', value: 'Glenda Rodriguez' },
+  { name: 'Mrs. Glenda Robriguez', value: 'Glenda Robriguez' },
   { name: 'Ms. Mila Ansagay', value: 'Mila Ansagay' },
   { name: 'Dra. Weng Catanaoan', value: 'Weng Catanaoan' },
   { name: 'Mrs. Rowena Datinginoo', value: 'Rowena Datinginoo' },
-  { name: 'Ms. Ma. Zarah Muli', value: 'Zarah Muli' },
+  { name: 'Mr. Ma. Zarah Muli', value: 'Zarah Muli' },
   { name: 'Mrs. Thelma Muli', value: 'Thelma Muli' },
   { name: 'Mr. Angelo Muli', value: 'Angelo Muli' },
 ]);
 // Predefined 18 Shots data
 const eighteenShotsData = ref<{ name: string; value: string }[]>([
-  { name: 'Ms. Angelica Aquino', value: 'Angelica Aquino' },
-  { name: 'Mrs. Marlyn Aquino', value: 'Marlyn Aquino' },
-  { name: 'Ms. Precy Aspiras', value: 'Precy Aspiras' },
-  { name: 'Ms. Jessica Aspiras', value: 'Jessica Aspiras' },
-  { name: 'Mrs. Luisa Canales', value: 'Luisa Canales' },
-  { name: 'Ms. Jenifer Aytona', value: 'Jenifer Aytona' },
-  { name: 'Mrs. Clarissa Dionaldo', value: 'Clarissa Dionaldo' },
-  { name: 'Ms. Charlmie de Torres', value: 'Charlmie de Torres' },
-  { name: 'Mrs. Joan Magno', value: 'Joan Magno' },
-  { name: 'Mrs. Jessica Aspiras', value: 'Jessica Aspiras' },
-  { name: 'Mrs. Jen-Jen Valdez', value: 'Jen-Jen Valdez' },
-  { name: 'Mrs. Floser Nepomuceno', value: 'Floser Nepomuceno' },
-  { name: 'Ms. Mila Ansagay', value: 'Mila Ansagay' },
-  { name: 'Dra. Weng Catanaoan', value: 'Weng Catanaoan' },
-  { name: 'Mrs. Rowena Datinginoo', value: 'Rowena Datinginoo' },
-  { name: 'Ms. Ma. Zarah Muli', value: 'Zarah Muli' },
-  { name: 'Mrs. Thelma Muli', value: 'Thelma Muli' },
-  { name: 'Mr. Angelo Muli', value: 'Angelo Muli' },
+  { name: 'Ms. Daphne Asombrado', value: 'Daphne Asombrado' },
+  { name: 'Ms. Renoakyle Alcantara', value: 'Renoakyle Alcantara' },
+  { name: 'Ms. Chelsy Llorca', value: 'Chelsy Llorca' },
+  { name: 'Ms. Brillian Vertudes', value: 'Brillian Vertudes' },
+  { name: 'Ms. Jhon Ryan Dellomas', value: 'Jhon Ryan Dellomas' },
+  { name: 'Ms. Rhiangelie Sinsoro', value: 'Rhiangelie Sinsoro' },
+  { name: 'Ms. Shermaine Leoperio', value: 'Shermaine Leoperio' },
+  { name: 'Ms. Angeline Lolin', value: 'Angeline Lolin' },
+  { name: 'Ms. Brydhe Ganub', value: 'Brydhe Ganub' },
+  { name: 'Ms. Ferleene Monog', value: 'Ferleene Monog' },
+  { name: 'Ms. Stephanie Bangit', value: 'Stephanie Bangit' },
+  { name: 'Ms. Rexie Van Galanta', value: 'Rexie Van Galanta' },
+  { name: 'Ms. Mariel Panganiban', value: 'Mariel Panganiban' },
+  { name: 'Ms. Frinces Aron', value: 'Frinces Aron' },
+  { name: 'Ms. Queency Basilan', value: 'Queency Basilan' },
+  { name: 'Ms. Dhanice Atibula', value: 'Dhanice Atibula' },
+  { name: 'Ms. Charline Muello', value: 'Charline Muello' },
+  { name: 'Mr. Xyra Gail Camaje', value: 'Xyra Gail Camaje' },
 ]);
 
 let unsubscribe: (() => void) | null = null; // To store the unsubscribe function
+
+// Function to request notification permission
+const requestNotificationPermission = async () => {
+  if (!("Notification" in window)) {
+    console.warn("This browser does not support desktop notification");
+    return;
+  }
+
+  if (Notification.permission !== "granted") {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      console.log("Notification permission granted!");
+    } else {
+      console.warn("Notification permission denied.");
+    }
+  }
+};
+
+// Function to display a notification
+const showNotification = (title: string, body: string, iconUrl?: string) => {
+  if (Notification.permission === "granted") {
+    new Notification(title, {
+      body: body,
+      icon: iconUrl || '/favicon.ico', // You can provide a custom icon URL
+    });
+  }
+};
 
 // Function to set up the real-time listener for users
 const setupUsersListener = () => {
   const usersCollectionRef = collection(db, "users");
   unsubscribe = onSnapshot(usersCollectionRef, (querySnapshot) => {
+    // Keep track of the previous state to detect changes
+    const previousUsers = [...usersList.value];
     const fetchedUsers: any[] = [];
     querySnapshot.forEach((doc) => {
       fetchedUsers.push({ id: doc.id, ...doc.data() });
     });
+
     usersList.value = fetchedUsers;
     console.log("Real-time fetched users:", usersList.value);
 
     // Re-process 18 Candles and 18 Roses data whenever usersList changes
     processEighteenRoses();
     processEighteenCandles(); // Corrected function name
+    processEighteenShot();
+
+    // Check for new attendees or changes in attendance
+    const newAttendees: any[] = [];
+    const updatedAttendees: any[] = [];
+
+    fetchedUsers.forEach(newUser => {
+      const oldUser = previousUsers.find(oldU => oldU.id === newUser.id);
+      if (!oldUser) {
+        newAttendees.push(newUser);
+      } else if (oldUser.attended !== newUser.attended) {
+        updatedAttendees.push(newUser);
+      }
+    });
+
+    // Trigger notifications for new or updated attendees
+    if (newAttendees.length > 0) {
+      newAttendees.forEach(attendee => {
+        const message = `${attendee.name} has just RSVP'd!`;
+        showNotification("New RSVP Received!", message);
+      });
+    }
+    if (updatedAttendees.length > 0) {
+      updatedAttendees.forEach(attendee => {
+        const status = attendee.attended === 'Attending' ? 'confirmed their attendance' : 'updated their RSVP';
+        const message = `${attendee.name} has ${status}!`;
+        showNotification("RSVP Status Updated!", message);
+      });
+    }
+
   }, (error) => {
     console.error("Error fetching real-time RSVPs: ", error);
   });
@@ -268,6 +343,32 @@ const processEighteenCandles = () => { // Renamed for clarity
   });
 };
 
+const processEighteenShot = () => {
+  // eighteenShotsData
+  eighteenShotWithAttendance.value = eighteenShotsData.value.map(r => {
+    const matchedUser = usersList.value.find(user =>
+      user.name && r.name.toLowerCase().includes(user.name.toLowerCase())
+    );
+
+    return {
+      id: matchedUser ? matchedUser.id : r.value, // Use Firestore ID if matched, otherwise a fallback
+      name: r.name,
+      attended: matchedUser ? matchedUser.attended : false, // Default to false if no match
+      notAttended: matchedUser ? !matchedUser.attended : true, // Default to true if no match
+      timeAccepted: (matchedUser && matchedUser.attended && matchedUser.timeAccepted)
+        ? new Date(matchedUser.timeAccepted).toLocaleString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+          })
+        : '',
+    };
+
+  })
+}
+
+
 // 3. Computed Properties for Categorization (remain largely the same)
 // Consider if 'attendees' and its computed properties 'eightCandles' and 'guests' are still needed
 // if all attendee data is now being pulled from 'usersList' and processed into the 'eighteenRosesWithAttendance'
@@ -290,10 +391,13 @@ const removeAttendee = (idToRemove: string) => {
 
 const totalAttendeesCount = computed(() => {
 
-  const attendedRoses = eighteenRosesWithAttendance.value.filter(p => p.attended).length;
-  const attendedCandles = eighteenCandlesWithAttendance.value.filter(p => p.attended).length;
+  // const attendedRoses = eighteenRosesWithAttendance.value.filter(p => p.attended == 'Attending').length;
+  // const attendedCandles = eighteenCandlesWithAttendance.value.filter(p => p.attended == 'Attending' ).length;
+  const attendedRoses = eighteenRosesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
+  const attendedCandles = eighteenCandlesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
+
   const confirmedGuests = guests.value.filter(g => g.attended).length; 
-  const confirmedEightCandles = eightCandles.value.filter(e => e.attended).length; // Assuming 'attended' property for 8 Candles too
+  const confirmedEightCandles = eightCandles.value.filter(e => (e.attended as string) === 'Attending').length; // Assuming 'attended' property for 8 Candles too
   // Not Attending
   return attendedRoses + attendedCandles + confirmedGuests + confirmedEightCandles;
 });
@@ -305,6 +409,7 @@ const eighteenCandlesAttendedCount = computed(() => {
 
 // Lifecycle hooks
 onMounted(() => {
+  requestNotificationPermission(); // Request permission when component mounts
   setupUsersListener(); // Start listening for real-time updates when the component is mounted
 });
 
@@ -723,7 +828,7 @@ h2 {
 }
 
 .tag-attended {
-  /* background-color: #3cb371;  */
+  /* background-color: #3cb371;  */
   background-color: transparent;
   color: black;
 }
@@ -733,7 +838,7 @@ h2 {
 }
 
 .tag-pending {
-  /* background-color: #FFA500;  */
+  /* background-color: #FFA500;  */
   background-color: transparent;
   /* color: white; */
 }
