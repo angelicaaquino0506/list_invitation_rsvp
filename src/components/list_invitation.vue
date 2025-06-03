@@ -7,21 +7,21 @@
         <i class="fas fa-crown icon-large"></i>
         <span>Total Attendees: {{ totalAttendeesCount }}</span>
       </div>
-      <div class="summary-card pop-bounce">
+      <!-- <div class="summary-card pop-bounce">
         <i class="fas fa-users icon-large"></i>
         <span>Total Not Attendees: {{ eighteenCandlesAttendedCount }}</span>
+      </div> -->
+      <div class="summary-card pop-bounce">
+        <i class="fas fa-glass-cheers icon-large"></i>
+        <span>18th Shot's Confirmed: {{ eighteenShotAttendedCount }}</span>
       </div>
       <div class="summary-card pop-bounce">
-        <i class="fas fa-users icon-large"></i>
-        <span>18th Shot Confirmed: {{ eighteenShotAttendedCount }}</span>
-      </div>
-      <div class="summary-card pop-bounce">
-        <i class="fas fa-users icon-large"></i>
+        <i class="fas fa-microphone-alt icon-large"></i>
         <span>18th Candles Confirmed: {{ eighteenCandlesAttendedCount }}</span>
       </div>
       <div class="summary-card pop-bounce">
-        <i class="fas fa-users icon-large"></i>
-        <span>18th Roses Confirmed: {{ eighteenCandlesAttendedCount }}</span>
+        <i class="fas fa-user-tie icon-large"></i>
+        <span>18th Roses Confirmed: {{ eighteenRosesAttendedCount }}</span>
       </div>
   
     
@@ -33,9 +33,8 @@
 
     <div class="attendee-lists">
       <h3 class="slide-in-heading">The Royal Guest Scroll</h3>
-
       <div class="category pulse-border">
-        <h4><i class="fas fa-star-shooting category-icon"></i> The 18th Dazzling Roses</h4>
+        <h4><i class="fas fa-heart category-icon"></i> The 18th Dazzling Roses</h4>
         <div v-if="eighteenRosesWithAttendance.length" class="attendee-table-container">
           <table class="attendee-table shimmer-effect">
             <thead>
@@ -48,18 +47,17 @@
               <tr v-for="(person, index) in eighteenRosesWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
-                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending', 'swing-in']" :style="{'--item-index': index}">
-                    {{ person.attended ? 'Attended' : 'Pending' }}
-                  </span> -->
-                  <!-- <span class="attendance-tag tag-attended swing-in">{{ person.attended ? person.attended : '' }}</span> -->
-                  <!-- <span class="attendance-tag tag-attended">{{ person.attended ? person.attended : '' }}</span> -->
 
-                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending',]" :style="{'--item-index': index}">
+                  <!-- <span class="attendance-tag tag-attended">
                     {{ person.attended ? person.attended : '' }}
                   </span> -->
 
-                  <span class="attendance-tag tag-attended">
-                    {{ person.attended ? person.attended : '' }}
+                  <span
+                    v-if="person.attended !== false" 
+                    class="attendance-tag tag-attended"
+                    :class="{ 'green-color': person.attended == 'Attending', 'red-color': person.attended == 'Not Attending' }"
+                  >
+                    {{ person.attended }}
                   </span>
                 
                 </td>
@@ -84,14 +82,21 @@
               <tr v-for="(person, index) in eighteenCandlesWithAttendance" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
                 <td>{{ person.name }}</td>
                 <td class="text-center">
-                  <!-- tag-not-attended -->
-                  <!-- <span :class="['attendance-tag', person.attended ? 'tag-attended' : 'tag-pending']">
-                    {{ person.attended ? 'Attended' : 'Pending' }}
+                  <!-- <span class="attendance-tag tag-attended">
+                    {{ person.attended ? person.attended : '' }}
                   </span> -->
 
-                  <span class="attendance-tag tag-attended">
+                  <!-- <span class="attendance-tag tag-attended" 
+                    style="background-color: {{ person.attended === 'Attending' ? 'green' : 'red' }};">
                     {{ person.attended ? person.attended : '' }}
-                  </span>
+                </span> -->
+                <span
+                  v-if="person.attended !== false" 
+                  class="attendance-tag tag-attended"
+                  :class="{ 'green-color': person.attended == 'Attending', 'red-color': person.attended == 'Not Attending' }"
+                >
+                  {{ person.attended }}
+                </span>
                 </td>
               </tr>
             </tbody>
@@ -102,7 +107,7 @@
 
       <!-- 18th Shot -->
       <div class="category pulse-border">
-        <h4><i class="fas fa-heart category-icon"></i> The 18th Beloved Shots</h4>
+        <h4><i class="fas fa-heart category-icon"></i> The 18th WonderFul Shots</h4>
         <div v-if="eighteenShotWithAttendance.length" class="attendee-table-container">
           <table class="attendee-table shimmer-effect">
             <thead>
@@ -119,8 +124,16 @@
                   <!-- <span >
                     {{ person.attended }}
                   </span> -->
-                  <span class="attendance-tag tag-attended">
+                  <!-- <span class="attendance-tag tag-attended">
                     {{ person.attended ? person.attended : '' }}
+                  </span> -->
+
+                  <span
+                    v-if="person.attended !== false" 
+                    class="attendance-tag tag-attended"
+                    :class="{ 'green-color': person.attended == 'Attending', 'red-color': person.attended == 'Not Attending' }"
+                  >
+                    {{ person.attended }}
                   </span>
                 </td>
               </tr>
@@ -130,7 +143,7 @@
         <p v-else class="empty-message fade-in-text">The 18th Beloved Candles are yet to grace us with their presence.</p>
       </div>
 
-      <div class="category pulse-border">
+      <!-- <div class="category pulse-border">
         <h4><i class="fas fa-champagne-glasses category-icon"></i> Esteemed Guests</h4>
         <ul v-if="guests.length">
           <li v-for="(person, index) in guests" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
@@ -141,6 +154,39 @@
           </li>
         </ul>
         <p v-else class="empty-message fade-in-text">Our esteemed guests are still sending their RSVPs!</p>
+      </div> -->
+
+      <div class="category pulse-border">
+        <h4> <i class="fas fa-heart category-icon"></i> Esteemed Guests</h4>
+        <div v-if="guestInvited.length" class="attendee-table-container">
+          <table class="attendee-table shimmer-effect">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th style="text-align: center;" class="text-center">Attended?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(person, index) in guestInvited" :key="person.id" class="list-item-fade" :style="{'--item-index': index}">
+                <td>{{ person.name }}</td>
+                <td class="text-center">
+                  <!-- <span>
+                    {{ person.attended }}
+                  </span> -->
+
+                  <span
+                    v-if="person.attended !== false" 
+                    class="attendance-tag tag-attended"
+                    :class="{ 'green-color': person.attended == 'Attending', 'red-color': person.attended == 'Not Attending' }"
+                  >
+                    {{ person.attended }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p v-else class="empty-message fade-in-text">The 18th Beloved Candles are yet to grace us with their presence.</p>
       </div>
     </div>
   </div>
@@ -162,7 +208,7 @@ interface EighteenRoseAttendee {
   id: string; // Changed to string to match Firestore doc.id
   name: string;
   // attended: boolean;
-  attended: string;
+  attended: any;
   notAttended: boolean;
   timeAccepted: string;
 }
@@ -170,7 +216,14 @@ interface EighteenRoseAttendee {
 interface EighteenCandlesAttendee {
   id: string;
   name: string;
-  attended: string;
+  attended: any;
+  notAttended: boolean;
+  timeAccepted: string;
+}
+interface GuestAttendee {
+  id: string;
+  name: string;
+  attended: any;
   notAttended: boolean;
   timeAccepted: string;
 }
@@ -181,6 +234,7 @@ const attendees = ref<Attendee[]>([]); // For 'One of the 8 Candles' and 'Guests
 const eighteenRosesWithAttendance = ref<EighteenRoseAttendee[]>([]);
 const eighteenCandlesWithAttendance = ref<EighteenCandlesAttendee[]>([]);
 const eighteenShotWithAttendance = ref<EighteenCandlesAttendee[]>([]);
+const guestInvited = ref<GuestAttendee[]>([]);
 
 // Predefined 18 Roses data
 const eighteenRosesData = ref<{ name: string; value: string }[]>([
@@ -208,7 +262,7 @@ const eighteenRosesData = ref<{ name: string; value: string }[]>([
 const eighteenCandelData = ref<{ name: string; value: string }[]>([
   { name: 'Ms. Angelica Aquino', value: 'Angelica Aquino' },
   { name: 'Mrs. Marlyn Aquino', value: 'Marlyn Aquino' },
-  { name: 'Ms. Precy Aspiras', value: 'Precy Aspiras' },
+  { name: 'Ms. Percy Aspiras', value: 'Percy Aspiras' },
   { name: 'Ms. Jessica Aspiras', value: 'Jessica Aspiras' },
   { name: 'Mrs. Luisa Canales', value: 'Luisa Canales' },
   { name: 'Ms. Lourie Kay Cincua', value: 'Lourie Kay Cincua' },
@@ -262,8 +316,66 @@ const setupUsersListener = () => {
 
     // Re-process 18 Candles and 18 Roses data whenever usersList changes
     processEighteenRoses();
-    processEighteenCandles(); // Corrected function name
+    processEighteenCandles(); 
     processEighteenShot()
+
+
+    // guestInvited.value = usersList.value.map(user => ({
+    //   id: user.id,
+    //   name: user.name,
+    //   attended: user.attended ? user.attended : 'No RSVP', 
+    //   notAttended: !user.attended,
+    //   timeAccepted: (user.attended && user.timeAccepted)
+    //     ? new Date(user.timeAccepted).toLocaleString('en-US', {
+    //         hour: '2-digit',
+    //         minute: '2-digit',
+    //         second: '2-digit',
+    //         hour12: true,
+    //       })
+    //     : '',
+    // }));
+    // .filter(user => user.attended === 'Attending' && user.position == null)
+    guestInvited.value = usersList.value
+      .filter(user => user.attended == 'Attending' && user.position == '' )
+      .map(user => ({
+        id: user.id,
+        name: user.name,
+        attended: user.attended ? user.attended : 'No RSVP', 
+        notAttended: !user.attended,
+        timeAccepted: (user.attended && user.timeAccepted)
+          ? new Date(user.timeAccepted).toLocaleString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: true,
+            })
+          : '',
+      }));
+
+    // guestInvited.value = usersList.value.filter(r => {
+    //   // console.log(r.attended ,'rrrrrr')
+    //   return r.attended == 'Attending' && r.position == null
+
+    // })
+
+    // guestInvited.value = usersList.value
+    //   .filter(user => user.attended === 'Attending' && user.position === null)
+    //   .map(user => ({
+    //     id: user.id,
+    //     name: user.name,
+    //     attended: user.attended, // No need for ternary if we know it's 'Attending'
+    //     notAttended: false,     // Will always be false if attended is 'Attending'
+    //     timeAccepted: (user.timeAccepted) // No need to check user.attended again here
+    //       ? new Date(user.timeAccepted).toLocaleString('en-US', {
+    //           hour: '2-digit',
+    //           minute: '2-digit',
+    //           second: '2-digit',
+    //           hour12: true,
+    //         })
+    //       : '',
+    //   }));
+
+
   }, (error) => {
     console.error("Error fetching real-time RSVPs: ", error);
   });
@@ -349,8 +461,6 @@ const processEighteenShot = () => {
 
 
 
-
-
 // 3. Computed Properties for Categorization (remain largely the same)
 // Consider if 'attendees' and its computed properties 'eightCandles' and 'guests' are still needed
 // if all attendee data is now being pulled from 'usersList' and processed into the 'eighteenRosesWithAttendance'
@@ -377,11 +487,12 @@ const totalAttendeesCount = computed(() => {
   // const attendedCandles = eighteenCandlesWithAttendance.value.filter(p => p.attended == 'Attending' ).length;
   const attendedRoses = eighteenRosesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
   const attendedCandles = eighteenCandlesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
-
+  const attendedShots = eighteenShotWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
+  const generalGuestsAttended = guestInvited.value.length;
   const confirmedGuests = guests.value.filter(g => g.attended).length; 
   const confirmedEightCandles = eightCandles.value.filter(e => (e.attended as string) === 'Attending').length; // Assuming 'attended' property for 8 Candles too
   // Not Attending
-  return attendedRoses + attendedCandles + confirmedGuests + confirmedEightCandles;
+  return attendedRoses + attendedCandles + confirmedGuests + attendedShots + confirmedEightCandles + generalGuestsAttended;
 });
 
 const eighteenCandlesAttendedCount = computed(() => {
@@ -389,6 +500,11 @@ const eighteenCandlesAttendedCount = computed(() => {
   return eighteenCandlesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
 });
 const eighteenShotAttendedCount = computed(() => {
+ 
+  return eighteenShotWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
+});
+
+const eighteenRosesAttendedCount = computed(() => {
  
   return eighteenRosesWithAttendance.value.filter(p => (p.attended as string) === 'Attending').length;
 });
@@ -915,5 +1031,15 @@ h2 {
     height: 35px;
     font-size: 0.9rem;
   }
+}
+
+.red-color {
+  background-color: transparent;
+  color: red;
+}
+
+.green-color {
+  background-color: transparent;
+  color: green;
 }
 </style>
