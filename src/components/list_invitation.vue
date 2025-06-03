@@ -7,10 +7,6 @@
         <i class="fas fa-crown icon-large"></i>
         <span>Total Attendees: {{ totalAttendeesCount }}</span>
       </div>
-      <!-- <div class="summary-card pop-bounce">
-        <i class="fas fa-users icon-large"></i>
-        <span>Total Not Attendees: {{ eighteenCandlesAttendedCount }}</span>
-      </div> -->
       <div class="summary-card pop-bounce">
         <i class="fas fa-glass-cheers icon-large"></i>
         <span>18th Shot's Confirmed: {{ eighteenShotAttendedCount }}</span>
@@ -617,6 +613,7 @@ h2 {
 /* --- Summary Cards Grid --- */
 .card-grid {
   display: grid;
+  /* grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); */
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 25px;
   margin-bottom: 50px;
@@ -918,14 +915,15 @@ h2 {
 
 /* Attendance Tags */
 .attendance-tag {
-  display: inline-block;
-  padding: 8px 15px;
-  border-radius: 25px;
+  /* display: inline-block; */
+  /* padding: 8px 15px; */
+  /* border-radius: 25px; */
   font-weight: 700;
-  font-size: 0.95rem;
+  /* font-size: 0.95rem; */
+  font-size: 10px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
 }
 
 .tag-attended {
@@ -974,10 +972,18 @@ h2 {
     font-size: 2.8rem;
   }
 
-  .card-grid {
-    grid-template-columns: 1fr;
+  /* .card-grid { */
+    /* grid-template-columns: 1fr; */
+    /* grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
-  }
+  } */
+
+  @media (max-width: 550px) { /* Add a new breakpoint for 2 columns before 1 */
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+        gap: 15px; /* Adjust gap if needed */
+    }
+}
 
   .attendee-lists h3 {
     font-size: 2rem;
@@ -989,6 +995,10 @@ h2 {
     text-align: center;
   }
 
+  .card-grid {
+   grid-template-columns: 1fr; /* Force 1 column at 480px and below */
+  }
+
   .category-icon {
     margin-right: 0;
     margin-bottom: 10px;
@@ -996,8 +1006,10 @@ h2 {
 
   .attendee-table th,
   .attendee-table td {
-    padding: 10px 12px;
-    font-size: 0.9rem;
+    /* padding: 10px 12px; */
+    padding: 5px 12px;
+    /* font-size: 0.9rem; */
+    font-size: 10px;
   }
 }
 
